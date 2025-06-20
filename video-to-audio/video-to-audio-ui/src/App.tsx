@@ -4,10 +4,13 @@ import viteLogo from "/vite.svg";
 import "./App.css";
 import { ProgressButton } from "./components/ProgressButton";
 import { useAudioJob } from "./hooks/useAudioJob";
+import { useSmoothProgress } from "./hooks/useSmoothProgress";
 
 function App() {
   const [url, setUrl] = useState("");
   const { job, loading, audioFile, error, startAudioJob } = useAudioJob();
+  const realProgress = job?.progress ?? 0;
+  const animatedProgress = useSmoothProgress(realProgress, 1); // 1% per frame
 
   return (
     <div style={{ maxWidth: 500, margin: "2rem auto", textAlign: "center" }}>
@@ -32,12 +35,10 @@ function App() {
       <br />
       <ProgressButton
         loading={loading}
-        progress={job?.progress ?? 0}
+        progress={animatedProgress}
         disabled={!url || loading}
         onClick={() => startAudioJob(url)}
-      >
-        Extract Audio
-      </ProgressButton>
+      />
 
       {audioFile && (
         <div style={{ marginTop: "2rem" }}>

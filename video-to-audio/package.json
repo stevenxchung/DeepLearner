@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "dev": "concurrently -n api,ui \"bun run --cwd ./video-to-audio-api start\" \"bun run --cwd ./video-to-audio-ui dev\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

@@ -7,8 +7,8 @@ const API_URL = import.meta.env.VITE_VIDEO_PROCESSOR_API_URL;
 export function useAudioJob() {
   const [job, setJob] = useState<AudioJob | null>(null);
   const [loading, setLoading] = useState(false);
-  const [audioFile, setAudioFile] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [audioFile, setAudioFile] = useState<string | null>(null);
   const poller = useRef<number | null>(null);
 
   const clearPolling = () => {
@@ -16,10 +16,12 @@ export function useAudioJob() {
   };
 
   const startAudioJob = async (url: string) => {
+    // Reset states when starting new job
+    setJob(null);
     setLoading(true);
     setError(null);
     setAudioFile(null);
-    setJob(null);
+
     try {
       const res = await fetch(`${API_URL}/extract-audio`, {
         method: "POST",
@@ -29,7 +31,7 @@ export function useAudioJob() {
       const data = await res.json();
       if (data.success && data.jobId) {
         setJob({
-          jobId: data.jobId,
+          id: data.jobId,
           progress: 0,
           status: "processing",
         });
@@ -64,7 +66,7 @@ export function useAudioJob() {
         setLoading(false);
         clearPolling();
       }
-    }, 1000);
+    }, 2000);
   };
 
   // Optional: clean up polling on unmount

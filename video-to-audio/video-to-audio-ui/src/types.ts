@@ -1,7 +1,7 @@
 export type JobStatus = "processing" | "done" | "failed";
 
 export interface AudioJob {
-  jobId: string;
+  id: string;
   progress: number;
   status: JobStatus;
   filename?: string;
