@@ -2,15 +2,16 @@ import { useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
-import { ProgressButton } from "./components/ProgressButton";
+
 import { useAudioJob } from "./hooks/useAudioJob";
-import { useSmoothProgress } from "./hooks/useSmoothProgress";
+import { useProgressLoader } from "./hooks/useProgressLoader";
+import { ActionButton } from "./components/ActionButton";
+import { ReactiveInput } from "./components/ReactiveInput";
 
 function App() {
   const [url, setUrl] = useState("");
-  const { job, loading, audioFile, error, startAudioJob } = useAudioJob();
-  const realProgress = job?.progress ?? 0;
-  const animatedProgress = useSmoothProgress(realProgress, 1); // 1% per frame
+  const { loading, audioFile, error, startAudioJob } = useAudioJob();
+  const progress = useProgressLoader(loading, !!error);
 
   return (
     <div style={{ maxWidth: 500, margin: "2rem auto", textAlign: "center" }}>
@@ -24,21 +25,27 @@ function App() {
         </a>
       </div>
       <h1>Video Audio Extractor</h1>
-      <input
-        type="text"
-        value={url}
-        placeholder="Paste URL here"
-        onChange={(e) => setUrl(e.target.value)}
-        style={{ width: "80%", padding: "0.5rem" }}
-      />
-      <br />
-      <br />
-      <ProgressButton
-        loading={loading}
-        progress={animatedProgress}
-        disabled={!url || loading}
-        onClick={() => startAudioJob(url)}
-      />
+
+      <div style={{ width: "84%", margin: "28px auto 0 auto" }}>
+        <ReactiveInput
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          placeholder="Paste URL here"
+          progress={progress}
+          loading={loading}
+          error={!!error}
+          autoComplete="off"
+        />
+      </div>
+
+      <div style={{ marginTop: 28 }}>
+        <ActionButton
+          loading={loading}
+          error={!!error}
+          disabled={!url || loading}
+          onClick={() => startAudioJob(url)}
+        />
+      </div>
 
       {audioFile && (
         <div style={{ marginTop: "2rem" }}>

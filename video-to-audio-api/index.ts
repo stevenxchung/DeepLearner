@@ -5,6 +5,7 @@ import { spawn } from "child_process";
 import path from "path";
 import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
+import { JobStatus, type AudioJob } from "./types";
 
 const app = express();
 app.use(cors());
@@ -12,17 +13,6 @@ app.use(express.json());
 
 const AUDIO_FOLDER = path.join(__dirname, "audio");
 if (!fs.existsSync(AUDIO_FOLDER)) fs.mkdirSync(AUDIO_FOLDER);
-
-interface Job {
-  id: string;
-  progress: number;
-  status: "processing" | "done" | "failed";
-  filename: string;
-  error: string | null;
-}
-
-// TODO: may consider using Redis to store statuses
-const JOBS: Record<string, Job> = {};
 
 app.get("/health", (req: Request, res: Response) => {
   res.send("Healthy!");
@@ -40,10 +30,10 @@ app.post("/extract-audio", async (req: Request, res: Response) => {
   const filename = `audio-${jobId}.mp3`;
   const outPath = path.join(AUDIO_FOLDER, filename);
 
-  JOBS[jobId] = {
+  const job: AudioJob = {
     id: jobId,
     progress: 0,
-    status: "processing",
+    status: JobStatus.PROCESSING,
     filename,
     error: null,
   };
@@ -58,51 +48,26 @@ app.post("/extract-audio", async (req: Request, res: Response) => {
     url,
   ]);
 
-  yt.stdout.on("data", (data: Buffer) => {
-    const text = data.toString();
-    // Split on newlines and carriage returns
-    text.split(/[\r\n]+/).forEach((line) => {
-      // Uncomment to debug lines received
-      // if (line.trim()) console.log("[yt-dlp stdout line]", line);
-      const m = line.match(/(\d{1,3}(?:\.\d+)?)%/);
-      if (m && JOBS[jobId]) {
-        JOBS[jobId].progress = Number(m[1]);
-        // Optionally log progress updates for validation
-        // console.log(`[yt-dlp progress update] ${m[1]}%`);
-      }
-    });
-  });
-
   yt.on("close", (code: number) => {
-    if (JOBS[jobId]) {
-      if (code === 0) {
-        JOBS[jobId].progress = 100;
-        JOBS[jobId].status = "done";
-      } else {
-        JOBS[jobId].status = "failed";
-        JOBS[jobId].error = "yt-dlp exited with code " + code;
-      }
+    if (code === 0) {
+      job.progress = 100;
+      job.status = JobStatus.DONE;
+      return res.json({ job });
+    } else {
+      job.status = JobStatus.FAILED;
+      job.error = "yt-dlp exited with code " + code;
+      res.status(500).json({ error: job.error });
+      return;
     }
   });
 
-  res.json({ success: true, jobId });
-  return;
-});
-
-app.get("/progress/:jobId", (req: Request, res: Response) => {
-  const { jobId } = req.params;
-  if (!jobId) {
-    res.status(400).json({ error: "Bad request" });
+  yt.on("error", (err) => {
+    job.status = JobStatus.FAILED;
+    job.error = "yt-dlp process error: " + err.message;
+    // .end() in case error and close both fire
+    res.status(500).json({ error: job.error });
     return;
-  }
-
-  const job = JOBS[jobId];
-  if (!job) {
-    res.status(404).json({ error: "No such job" });
-    return;
-  }
-  res.json(job);
-  return;
+  });
 });
 
 app.get("/audio/:filename", (req: Request, res: Response) => {
