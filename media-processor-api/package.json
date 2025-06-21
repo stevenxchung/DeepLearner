@@ -1,5 +1,5 @@
 {
-  "name": "video-to-audio-api",
+  "name": "media-processor-api",
   "module": "index.ts",
   "type": "module",
   "private": true,
