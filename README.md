@@ -1,6 +1,6 @@
 # DeepLearner
 
-Full suite of tools to process video to audio and audio to text
+End-to-end multimedia to text AI companion. Includes a full suite of tools to process video to audio and audio to text for analysis and retrieval.
 
 ## Requirements
 
