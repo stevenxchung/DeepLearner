@@ -1,5 +1,5 @@
 {
-  "name": "media-processor-api",
+  "name": "media-conversion-api",
   "module": "main.ts",
   "type": "module",
   "private": true,
