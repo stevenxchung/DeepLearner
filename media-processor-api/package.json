@@ -1,10 +1,10 @@
 {
   "name": "media-processor-api",
-  "module": "index.ts",
+  "module": "main.ts",
   "type": "module",
   "private": true,
   "scripts": {
-    "start": "bun --hot index.ts"
+    "start": "bun --hot main.ts"
   },
   "devDependencies": {
     "@types/bun": "latest"
