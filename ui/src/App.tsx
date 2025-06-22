@@ -3,14 +3,15 @@ import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
 
-import { useAudioJob } from "./hooks/useAudioJob";
+import { useVideoToAudioJob } from "./hooks/useVideoToAudioJob";
 import { useProgressLoader } from "./hooks/useProgressLoader";
 import { ActionButton } from "./components/ActionButton";
 import { ReactiveInput } from "./components/ReactiveInput";
 
 function App() {
   const [url, setUrl] = useState("");
-  const { loading, audioFile, error, startAudioJob } = useAudioJob();
+  const { loading, audioFile, error, startVideoToAudioJob } =
+    useVideoToAudioJob();
   const progress = useProgressLoader(loading, !!error);
 
   return (
@@ -43,7 +44,7 @@ function App() {
           loading={loading}
           error={!!error}
           disabled={!url || loading}
-          onClick={() => startAudioJob(url)}
+          onClick={() => startVideoToAudioJob(url)}
         />
       </div>
 
