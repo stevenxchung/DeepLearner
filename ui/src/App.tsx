@@ -3,60 +3,75 @@ import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
 
-import { useVideoToAudioJob } from "./hooks/useVideoToAudioJob";
-import { useProgressLoader } from "./hooks/useProgressLoader";
+import { useMediaJob } from "./hooks/useMediaJob";
 import { ActionButton } from "./components/ActionButton";
 import { ReactiveInput } from "./components/ReactiveInput";
+import { JobTable } from "./components/JobTable";
+import { JobType, type MediaJob } from "./types";
 
 function App() {
   const [url, setUrl] = useState("");
-  const { loading, audioFile, error, startVideoToAudioJob } =
-    useVideoToAudioJob();
-  const progress = useProgressLoader(loading, !!error);
+  const [jobs, setJobs] = useState<MediaJob[]>([]);
+
+  const { apiError, startMediaJob } = useMediaJob({
+    onJobQueued: (job) => {
+      setJobs((prev) => [job, ...prev]);
+    },
+    onJobUpdated: (updatedJob) => {
+      setJobs((prev) =>
+        prev.map((job) =>
+          job.id === updatedJob.id ? { ...job, ...updatedJob } : job
+        )
+      );
+    },
+  });
 
   return (
-    <div style={{ maxWidth: 500, margin: "2rem auto", textAlign: "center" }}>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
+    <div className="min-h-screen bg-gray-50">
+      <div className="flex flex-col w-full max-w-3xl mx-auto py-8 gap-4">
+        <div className="py-16">
+          <div className="flex flex-row gap-8 justify-center items-center">
+            <a href="https://vite.dev" target="_blank">
+              <img src={viteLogo} className="logo h-24" alt="Vite logo" />
+            </a>
+            <a href="https://react.dev" target="_blank">
+              <img src={reactLogo} className="logo h-24" alt="React logo" />
+            </a>
+          </div>
+        </div>
+        <h1 className="text-2xl font-bold text-gray-700 mb-4">
+          Media Converter
+        </h1>
 
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Video Audio Extractor</h1>
-
-      <div style={{ width: "84%", margin: "28px auto 0 auto" }}>
         <ReactiveInput
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           placeholder="Paste URL here"
-          progress={progress}
-          loading={loading}
-          error={!!error}
+          error={!!apiError}
           autoComplete="off"
         />
-      </div>
 
-      <div style={{ marginTop: 28 }}>
-        <ActionButton
-          loading={loading}
-          error={!!error}
-          disabled={!url || loading}
-          onClick={() => startVideoToAudioJob(url)}
-        />
-      </div>
+        <div className="flex items-center gap-2 mb-6">
+          <ActionButton
+            text="⚡🔉"
+            hint="To audio"
+            color="bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-300"
+            onClick={() => startMediaJob(url, JobType.VIDEO_TO_AUDIO)}
+          />
 
-      {audioFile && (
-        <div style={{ marginTop: "2rem" }}>
-          <a href={audioFile} download>
-            Download Extracted Audio
-          </a>
+          <ActionButton
+            text="⚡📃"
+            hint="To text"
+            color="bg-indigo-600 hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-300"
+            onClick={() => startMediaJob(url, JobType.VIDEO_TO_TEXT)}
+          />
+          {apiError && (
+            <span className="text-red-600 text-sm ml-3">{apiError}</span>
+          )}
         </div>
-      )}
 
-      {error && <div style={{ color: "red", marginTop: "1rem" }}>{error}</div>}
+        <JobTable jobs={jobs} />
+      </div>
     </div>
   );
 }
