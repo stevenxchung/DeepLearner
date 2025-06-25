@@ -1,8 +1,9 @@
 export const JobStatus = {
-  QUEUED: "QUEUED",
-  PROCESSING: "PROCESSING",
   DONE: "DONE",
   FAILED: "FAILED",
+  NOT_FOUND: "NOT_FOUND",
+  PROCESSING: "PROCESSING",
+  QUEUED: "QUEUED",
 } as const;
 
 export const JobType = {
@@ -19,7 +20,22 @@ export interface MediaJob {
   progress: number;
   status: JobStatus;
   jobType: JobType;
+  timestamp?: string; // ISO 8601 Date string (from UI)
   audioFilename?: string;
-  transcript?: string;
+  textFilename?: string;
   error?: string | null;
+}
+
+export interface TranscriptionStatusResponse {
+  job_id: string;
+  progress: number;
+  status: JobStatus;
+  filename?: string;
+  reason?: string;
+}
+
+export interface AudioToTextResponse {
+  status: JobStatus;
+  filename?: string;
+  error?: string;
 }

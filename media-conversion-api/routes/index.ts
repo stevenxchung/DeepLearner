@@ -4,7 +4,13 @@ import express from "express";
 import type { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { type MediaJob, JobStatus, JobType } from "../types";
-import { addJob, getAudioFolder, getJob } from "../jobs";
+import {
+  addJob,
+  deleteJob,
+  getAudioFolder,
+  getJob,
+  getTextFolder,
+} from "../jobs";
 
 const router = express.Router();
 
@@ -19,8 +25,10 @@ router.post("/video-to-audio", (req: Request, res: Response) => {
     res.status(400).json({ error: "No URL provided." });
     return;
   }
+
+  const id = uuidv4();
   const job: MediaJob = {
-    id: uuidv4(),
+    id: id,
     url,
     progress: 0,
     status: JobStatus.QUEUED,
@@ -28,7 +36,7 @@ router.post("/video-to-audio", (req: Request, res: Response) => {
   };
   addJob(job);
 
-  res.json({ jobId: job.id });
+  res.json({ jobId: id });
   return;
 });
 
@@ -53,11 +61,17 @@ router.post("/video-to-text", (req: Request, res: Response) => {
   return;
 });
 
-router.get("/job/:id", (req: Request, res: Response) => {
+router.get("/job/progress/:id", (req: Request, res: Response) => {
+  // Gets progress across all jobs: video to audio, audio to text, etc.
   const job = getJob(req.params.id ?? "");
   if (!job) {
     res.status(404).json({ error: "Not found" });
     return;
+  }
+
+  if (job.status === JobStatus.DONE) {
+    // Remove job when complete
+    deleteJob(job.id);
   }
 
   res.json(job);
@@ -72,6 +86,23 @@ router.get("/audio/:filename", (req: Request, res: Response) => {
   }
 
   const filePath = path.join(getAudioFolder(), filename);
+  if (!fs.existsSync(filePath)) {
+    res.status(404).send("Not found");
+    return;
+  }
+
+  res.download(filePath);
+  return;
+});
+
+router.get("/text/:filename", (req: Request, res: Response) => {
+  const { filename } = req.params;
+  if (!filename) {
+    res.status(400).json({ error: "Bad request" });
+    return;
+  }
+
+  const filePath = path.join(getTextFolder(), filename);
   if (!fs.existsSync(filePath)) {
     res.status(404).send("Not found");
     return;

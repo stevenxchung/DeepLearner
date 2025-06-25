@@ -1,48 +1,82 @@
 import path from "path";
 import { JobStatus, JobType, type MediaJob } from "../types";
-import { videoToAudio } from "../utils/video-to-audio";
+import {
+  getYoutubeTitle,
+  formatTitle,
+  videoToAudio,
+} from "../utils/video-to-audio";
 import { audioToText } from "../utils/audio-to-text";
 
-const jobs = new Map<string, MediaJob>();
+// Limited to 2^24 ~ 16M entries which is OK for this implementation
+let jobCache = new Map<string, MediaJob>();
 const jobQueue: string[] = [];
 const AUDIO_FOLDER = path.resolve(__dirname, "../../audio");
+const TEXT_FOLDER = path.resolve(__dirname, "../../text");
 
 export function addJob(job: MediaJob) {
-  jobs.set(job.id, job);
+  jobCache.set(job.id, job);
   jobQueue.push(job.id);
 }
 
 export function getJob(id: string) {
-  return jobs.get(id);
+  return jobCache.get(id);
+}
+
+export function deleteJob(id: string) {
+  jobCache.delete(id);
 }
 
 export function getAudioFolder() {
   return AUDIO_FOLDER;
 }
 
+export function getTextFolder() {
+  return TEXT_FOLDER;
+}
+
 export function startJobWorker() {
   const processJob = async () => {
     // Checks for jobs every 10 seconds if queue is empty
     if (jobQueue.length === 0) return setTimeout(processJob, 1000 * 10);
+
     const jobId = jobQueue.shift();
     if (!jobId) return setImmediate(processJob);
-    const job = jobs.get(jobId);
+
+    const job = jobCache.get(jobId);
     if (!job) return setImmediate(processJob);
 
     try {
       job.status = JobStatus.PROCESSING;
       job.progress = 10;
 
-      const audioFile = `audio-${jobId}.mp3`;
-      const outPath = path.join(AUDIO_FOLDER, audioFile);
+      const title = await getYoutubeTitle(job.url);
+      const filename = formatTitle(title);
+      const audioFile = `${filename}.mp3`;
+      const outPath = path.join(AUDIO_FOLDER, `${filename}.mp3`);
 
-      await videoToAudio(job.url, outPath);
+      await videoToAudio(job.url, outPath, (percentComplete: number) => {
+        // Update progress as necessary
+        job.progress =
+          job.jobType === JobType.VIDEO_TO_TEXT
+            ? percentComplete * 50
+            : percentComplete * 100;
+      });
       job.audioFilename = audioFile;
-      job.progress = 50;
 
       // Only do transcription if requested
       if (job.jobType === JobType.VIDEO_TO_TEXT) {
-        job.transcript = await audioToText(outPath);
+        const audioToTextResponse = await audioToText(
+          job,
+          (percentComplete: number) => {
+            job.progress = 50 + percentComplete * 50;
+          }
+        );
+        if (audioToTextResponse.status === JobStatus.FAILED)
+          throw new Error(
+            `Failed to transcribe audio. ${audioToTextResponse.error}`
+          );
+
+        job.textFilename = audioToTextResponse.filename;
       }
 
       job.progress = 100;
