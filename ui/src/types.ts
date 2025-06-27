@@ -30,3 +30,5 @@ export interface JobQueuedResponse {
   jobId?: string;
   error?: string;
 }
+
+export type Message = { role: "user" | "agent"; content: string };

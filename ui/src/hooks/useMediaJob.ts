@@ -6,7 +6,7 @@ import {
   type MediaJob,
 } from "../types";
 
-const API_URL = import.meta.env.VITE_MEDIA_PROCESSOR_API_URL;
+const API_URL = `${import.meta.env.VITE_MEDIA_PROCESSOR_API_URL}/media`;
 
 export function useMediaJob({
   onJobQueued,
@@ -29,7 +29,7 @@ export function useMediaJob({
 
   const pollJobStatus = async (jobId: string) => {
     try {
-      const res = await fetch(`${API_URL}/job/progress/${jobId}`);
+      const res = await fetch(`${API_URL}/progress/${jobId}`);
       const job: MediaJob = await res.json();
       setJob(job);
 

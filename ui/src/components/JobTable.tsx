@@ -31,7 +31,7 @@ const DownloadLink = ({ job }: { job: MediaJob }) => {
   if (job.jobType === JobType.VIDEO_TO_AUDIO && job.audioFilename) {
     return (
       <a
-        href={`/audio/${job.audioFilename}`}
+        href={`/_audio/${job.audioFilename}`}
         download
         className="text-blue-600 underline"
       >
@@ -42,7 +42,7 @@ const DownloadLink = ({ job }: { job: MediaJob }) => {
   if (job.jobType === JobType.VIDEO_TO_TEXT && job.textFilename) {
     return (
       <a
-        href={`/text/${job.textFilename}`}
+        href={`/_text/${job.textFilename}`}
         download
         className="text-blue-600 underline"
       >
