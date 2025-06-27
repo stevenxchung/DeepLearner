@@ -1,7 +1,8 @@
 import os
 import logging
-from typing import Dict, Optional
+import torch
 import uvicorn
+
 
 from enum import Enum
 from time import perf_counter
@@ -9,6 +10,8 @@ from fastapi import BackgroundTasks, FastAPI
 from pydantic import BaseModel
 from faster_whisper import WhisperModel
 from mutagen import File as MutagenFile
+from typing import Dict, Optional
+
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
@@ -21,7 +24,7 @@ model = WhisperModel("tiny", device="cuda", compute_type="float16")
 
 API_DIR = os.path.dirname(__file__)
 ROOT_DIR = os.path.abspath(os.path.join(API_DIR, ".."))
-TEXT_DIR = os.path.join(ROOT_DIR, "text")
+TEXT_DIR = os.path.join(ROOT_DIR, "_text")
 os.makedirs(TEXT_DIR, exist_ok=True)
 
 
@@ -58,7 +61,7 @@ def _get_audio_duration(filepath):
 
 
 def _transcribe(req: TranscriptionRequest):
-    filepath = f"../audio/{req.filename}"
+    filepath = f"../_audio/{req.filename}"
     job_id = req.job_id
     progress = 0.0
 
@@ -107,7 +110,7 @@ def _transcribe(req: TranscriptionRequest):
                 )
         t1 = perf_counter()
         logger.info(f"Transcription complete for: {filepath}")
-        logger.info(f"Transcription initialized runtime {t1 - t0:.2f}s")
+        logger.info(f"Transcription runtime {t1 - t0:.2f}s")
         logger.info(f"Transcript successfully written to: {transcript_path}")
 
         job_cache[job_id] = TranscriptionStatus(
@@ -133,7 +136,7 @@ def health_check():
     return "Healthy!"
 
 
-@app.post("/transcribe", response_model=TranscriptionStatus)
+@app.post("/api/transcribe", response_model=TranscriptionStatus)
 def start_transcription(req: TranscriptionRequest, bg_tasks: BackgroundTasks):
     job_id = req.job_id
     job_cache[job_id] = TranscriptionStatus(
@@ -143,7 +146,7 @@ def start_transcription(req: TranscriptionRequest, bg_tasks: BackgroundTasks):
     return job_cache[job_id]
 
 
-@app.get("/transcribe/status/{job_id}", response_model=TranscriptionStatus)
+@app.get("/api/transcribe/status/{job_id}", response_model=TranscriptionStatus)
 def get_status(job_id: str):
     return job_cache.get(
         job_id,
@@ -157,4 +160,6 @@ def get_status(job_id: str):
 
 
 if __name__ == "__main__":
+    logger.info(f"Torch version Cuda: {torch.version.cuda}")
+    logger.info(f"CUDA available? {torch.cuda.is_available()}")
     uvicorn.run("main:app", host="127.0.0.1", port=6000, reload=False)

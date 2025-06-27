@@ -7,7 +7,8 @@ This project was created using `uv init` via [uv](https://docs.astral.sh/uv/gett
 To install dependencies:
 
 ```bash
-uv sync
+# To ensure PyTorch is GPU/CUDA-enabled
+uv pip install torch --index-url https://download.pytorch.org/whl/cu128 && uv sync
 ```
 
 To run:
