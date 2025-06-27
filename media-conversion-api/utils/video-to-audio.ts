@@ -1,4 +1,7 @@
 import { spawn } from "child_process";
+import path from "path";
+
+export const AUDIO_DIR = path.resolve(__dirname, "../../_audio");
 
 export async function getYoutubeTitle(url: string): Promise<string> {
   return new Promise((resolve, reject) => {

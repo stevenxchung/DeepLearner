@@ -1,3 +1,4 @@
+import path from "path";
 import {
   JobStatus,
   type AudioToTextResponse,
@@ -5,11 +6,14 @@ import {
   type TranscriptionStatusResponse,
 } from "../types";
 
+export const TEXT_DIR = path.resolve(__dirname, "../../_text");
+const TRANSCRIPTION_API = `${process.env.AUDIO_TO_TEXT_API}/api`;
+
 export async function audioToText(
   job: MediaJob,
   onProgress?: (percentage: number) => void
 ): Promise<AudioToTextResponse> {
-  const response = await fetch(`${process.env.AUDIO_TO_TEXT_API}/transcribe`, {
+  const response = await fetch(`${TRANSCRIPTION_API}/transcribe`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ job_id: job.id, filename: job.audioFilename }),
@@ -49,7 +53,7 @@ export async function audioToText(
     attempts++;
 
     const statusRes = await fetch(
-      `${process.env.AUDIO_TO_TEXT_API}/transcribe/status/${job.id}`
+      `${TRANSCRIPTION_API}/transcribe/status/${job.id}`
     );
     let statusData: TranscriptionStatusResponse | null = null;
     try {

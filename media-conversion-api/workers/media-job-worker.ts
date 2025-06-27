@@ -4,14 +4,13 @@ import {
   getYoutubeTitle,
   formatTitle,
   videoToAudio,
+  AUDIO_DIR,
 } from "../utils/video-to-audio";
 import { audioToText } from "../utils/audio-to-text";
 
 // Limited to 2^24 ~ 16M entries which is OK for this implementation
 let jobCache = new Map<string, MediaJob>();
 const jobQueue: string[] = [];
-const AUDIO_FOLDER = path.resolve(__dirname, "../../audio");
-const TEXT_FOLDER = path.resolve(__dirname, "../../text");
 
 export function addJob(job: MediaJob) {
   jobCache.set(job.id, job);
@@ -26,15 +25,7 @@ export function deleteJob(id: string) {
   jobCache.delete(id);
 }
 
-export function getAudioFolder() {
-  return AUDIO_FOLDER;
-}
-
-export function getTextFolder() {
-  return TEXT_FOLDER;
-}
-
-export function startJobWorker() {
+export function startMediaJobWorker() {
   const processJob = async () => {
     // Checks for jobs every 10 seconds if queue is empty
     if (jobQueue.length === 0) return setTimeout(processJob, 1000 * 10);
@@ -52,7 +43,7 @@ export function startJobWorker() {
       const title = await getYoutubeTitle(job.url);
       const filename = formatTitle(title);
       const audioFile = `${filename}.mp3`;
-      const outPath = path.join(AUDIO_FOLDER, `${filename}.mp3`);
+      const outPath = path.join(AUDIO_DIR, `${filename}.mp3`);
 
       await videoToAudio(job.url, outPath, (percentComplete: number) => {
         // Update progress as necessary

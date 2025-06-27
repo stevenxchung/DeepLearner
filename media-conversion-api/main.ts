@@ -1,7 +1,7 @@
 import app from "./app";
-import { startJobWorker } from "./jobs";
+import { startMediaJobWorker } from "./workers/media-job-worker";
 
-startJobWorker(); // Kicks off background processing
+startMediaJobWorker(); // Kicks off background processing
 
 const PORT = process.env.PORT ?? 5000;
 app.listen(PORT, () => {
