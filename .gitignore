@@ -1,5 +1,7 @@
 *.env
 *.mp3
+*.txt
+*__pycache__
 
 # dependencies (bun install)
 node_modules
