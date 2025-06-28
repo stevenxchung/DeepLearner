@@ -1,5 +1,6 @@
 import { spawn } from "child_process";
 import path from "path";
+import { JobType, type MediaJob } from "../types";
 
 export const AUDIO_DIR = path.resolve(__dirname, "../../_audio");
 
@@ -67,4 +68,28 @@ export function videoToAudio(
     );
     yt.on("error", reject);
   });
+}
+
+export async function runVideoToAudioWithFallback(
+  job: MediaJob,
+  outPath: string
+) {
+  let fallbackProgress = 0;
+  const startTime = Date.now();
+
+  // Start fallback progress timer (0 to 1 over 10 seconds)
+  const fallbackInterval = setInterval(() => {
+    const elapsed = (Date.now() - startTime) / 1000; // seconds
+    fallbackProgress = Math.min(elapsed / 10, 1);
+    job.progress =
+      job.jobType === JobType.VIDEO_TO_TEXT
+        ? fallbackProgress * 50
+        : fallbackProgress * 100;
+  }, 1000 * 0.5); // Update fallback progress every 500ms
+
+  await videoToAudio(job.url, outPath, (percentComplete: number) => {
+    job.progress = Math.max(percentComplete, job.progress);
+  });
+
+  clearInterval(fallbackInterval); // Cleanup
 }

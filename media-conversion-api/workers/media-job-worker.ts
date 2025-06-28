@@ -1,10 +1,10 @@
 import path from "path";
 import { JobStatus, JobType, type MediaJob } from "../types";
 import {
+  AUDIO_DIR,
   getYoutubeTitle,
   formatTitle,
-  videoToAudio,
-  AUDIO_DIR,
+  runVideoToAudioWithFallback,
 } from "../utils/video-to-audio";
 import { audioToText } from "../utils/audio-to-text";
 
@@ -38,20 +38,14 @@ export function startMediaJobWorker() {
 
     try {
       job.status = JobStatus.PROCESSING;
-      job.progress = 10;
+      job.progress = 0;
 
       const title = await getYoutubeTitle(job.url);
       const filename = formatTitle(title);
       const audioFile = `${filename}.mp3`;
       const outPath = path.join(AUDIO_DIR, `${filename}.mp3`);
 
-      await videoToAudio(job.url, outPath, (percentComplete: number) => {
-        // Update progress as necessary
-        job.progress =
-          job.jobType === JobType.VIDEO_TO_TEXT
-            ? percentComplete * 50
-            : percentComplete * 100;
-      });
+      await runVideoToAudioWithFallback(job, outPath);
       job.audioFilename = audioFile;
 
       // Only do transcription if requested
