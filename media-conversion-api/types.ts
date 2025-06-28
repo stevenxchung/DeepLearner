@@ -20,7 +20,7 @@ export interface MediaJob {
   progress: number;
   status: JobStatus;
   jobType: JobType;
-  timestamp?: string; // ISO 8601 Date string (from UI)
+  timestamp: string; // ISO 8601 Date string (from UI)
   audioFilename?: string;
   textFilename?: string;
   error?: string | null;
@@ -38,4 +38,10 @@ export interface AudioToTextResponse {
   status: JobStatus;
   filename?: string;
   error?: string;
+}
+
+export interface FileData {
+  name: string;
+  size: number; // In bytes
+  created: string;
 }

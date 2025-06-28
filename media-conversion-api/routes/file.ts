@@ -2,17 +2,39 @@ import path from "path";
 import fs from "fs/promises";
 import express from "express";
 import type { Request, Response } from "express";
+import type { FileData } from "../types";
 import { TEXT_DIR } from "../utils/audio-to-text";
+import { AUDIO_DIR } from "../utils/video-to-audio";
 
 const router = express.Router();
 
-router.get("/texts", async (req: Request, res: Response) => {
-  const files = await fs.readdir(TEXT_DIR);
-  res.json(files.filter((f) => f.endsWith(".txt")));
-  return;
+async function _getFileData(dir: string): Promise<FileData[]> {
+  const files = await fs.readdir(dir);
+  return Promise.all(
+    files.map(async (file) => {
+      const stat = await fs.stat(`${dir}/${file}`);
+      return {
+        name: file,
+        size: stat.size,
+        created: stat.birthtime.toISOString(),
+      };
+    })
+  );
+}
+
+router.get("/files", async (req: Request, res: Response) => {
+  try {
+    const [textData, audioData] = await Promise.all([
+      _getFileData(TEXT_DIR),
+      _getFileData(AUDIO_DIR),
+    ]);
+    res.json([...textData, ...audioData]);
+  } catch (err) {
+    res.status(500).json({ error: "Could not read files" });
+  }
 });
 
-router.get("/text/:filename", async (req: Request, res: Response) => {
+router.get("/:filename", async (req: Request, res: Response) => {
   const { filename } = req.params;
   if (!filename) {
     res.status(400).send("Bad request");
@@ -30,7 +52,7 @@ router.get("/text/:filename", async (req: Request, res: Response) => {
   }
 });
 
-router.delete("/text/:filename", async (req: Request, res: Response) => {
+router.delete("/:filename", async (req: Request, res: Response) => {
   const { filename } = req.params;
   if (!filename) {
     res.status(400).send("Bad request");

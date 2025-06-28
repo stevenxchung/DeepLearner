@@ -7,9 +7,13 @@ import { addJob, deleteJob, getJob } from "../workers/media-job-worker";
 const router = express.Router();
 
 router.post("/video-to-audio", (req: Request, res: Response) => {
-  const url = req.body.url;
+  const { url, timestamp } = req.body;
   if (!url) {
-    res.status(400).json({ error: "No URL provided." });
+    res.status(400).json({ error: "No url provided." });
+    return;
+  }
+  if (!timestamp) {
+    res.status(400).json({ error: "No timestamp provided." });
     return;
   }
 
@@ -17,6 +21,7 @@ router.post("/video-to-audio", (req: Request, res: Response) => {
   const job: MediaJob = {
     id: id,
     url,
+    timestamp,
     progress: 0,
     status: JobStatus.QUEUED,
     jobType: JobType.VIDEO_TO_AUDIO,
@@ -28,9 +33,13 @@ router.post("/video-to-audio", (req: Request, res: Response) => {
 });
 
 router.post("/video-to-text", (req: Request, res: Response) => {
-  const url = req.body.url as string;
+  const { url, timestamp } = req.body;
   if (!url) {
-    res.status(400).json({ error: "No URL provided." });
+    res.status(400).json({ error: "No url provided." });
+    return;
+  }
+  if (!timestamp) {
+    res.status(400).json({ error: "No timestamp provided." });
     return;
   }
 
@@ -38,6 +47,7 @@ router.post("/video-to-text", (req: Request, res: Response) => {
   const job: MediaJob = {
     id,
     url,
+    timestamp,
     progress: 0,
     status: JobStatus.QUEUED,
     jobType: JobType.VIDEO_TO_TEXT,
