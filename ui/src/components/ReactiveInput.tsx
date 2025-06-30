@@ -1,29 +1,61 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 
 interface ReactiveInputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {
-  error?: boolean;
+  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+  styles?: string;
+  disabled?: boolean;
   color?: string;
+  onSubmit?: () => void;
 }
 
 export const ReactiveInput: React.FC<ReactiveInputProps> = ({
-  error,
-  className = "",
-  ...inputProps
+  styles = "",
+  disabled,
+  value,
+  onSubmit,
+  ...props
 }) => {
+  const ref = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (el) {
+      el.style.height = "auto";
+      el.style.height = el.scrollHeight + "px";
+    }
+  }, [value]);
+
+  const handleInput = (e: React.FormEvent<HTMLTextAreaElement>) => {
+    const el = ref.current;
+    if (el) {
+      el.style.height = "auto";
+      el.style.height = el.scrollHeight + "px";
+    }
+    if (props.onInput) props.onInput(e);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // If `Enter` (but NOT `Shift+Enter`), submit!
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault(); // Prevent newline
+      onSubmit?.();
+    }
+    // Otherwise, allow default behavior (e.g. `Shift+Enter` inserts newline)
+    if (props.onKeyDown) props.onKeyDown(e);
+  };
+
   return (
-    <div className="relative">
-      <input
-        {...inputProps}
-        className={`block w-full px-4 py-2 rounded border text-base shadow transition 
-          duration-200 focus:outline-none bg-white 
-          ${
-            error
-              ? "border-red-500 focus:ring-2 focus:ring-red-300"
-              : "border-gray-300 focus:ring-2 focus:ring-blue-300"
-          } 
-          ${className}`}
-      />
-    </div>
+    <textarea
+      {...props}
+      ref={ref}
+      className={`block w-full px-4 py-3 rounded-xl border-0 text-base transition duration-200 focus:outline-none bg-white resize-none break-words
+        ${styles}`}
+      rows={1}
+      value={value}
+      disabled={disabled}
+      onInput={handleInput}
+      onKeyDown={handleKeyDown}
+      required
+    />
   );
 };

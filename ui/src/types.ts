@@ -31,4 +31,11 @@ export interface JobQueuedResponse {
   error?: string;
 }
 
+export interface FileData {
+  name: string;
+  size: number; // In bytes
+  created: string;
+}
+
 export type Message = { role: "user" | "agent"; content: string };
+export type JobPollingTimeMap = { [jobId: string]: number };

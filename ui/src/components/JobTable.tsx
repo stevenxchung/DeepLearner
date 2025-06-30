@@ -1,8 +1,5 @@
+import { useAppContext } from "../context/AppContext";
 import { JobStatus, JobType, type MediaJob } from "../types";
-
-interface JobTableProps {
-  jobs: MediaJob[];
-}
 
 // Helpers for rendering
 function formatStatus(status: JobStatus, error?: string | null | undefined) {
@@ -91,7 +88,13 @@ const JobRow = ({ job }: { job: MediaJob }) => {
   );
 };
 
-export const JobTable: React.FC<JobTableProps> = ({ jobs }) => {
+export const JobTable: React.FC = () => {
+  const { jobMap } = useAppContext();
+  const jobs = [...jobMap.values()];
+  jobs.sort(
+    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+  );
+
   return (
     <div className="overflow-x-auto shadow rounded bg-white">
       <table className="min-w-full text-sm">
