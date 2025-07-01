@@ -25,7 +25,7 @@ The following software needs to be installed on your local machine before runnin
 
 ### 📦 Package Managers
 
-For speed and efficiency we highly recommend the following:
+We highly recommend the following:
 
 - [**Bun**](https://bun.sh) – Fast JavaScript runtime & package manager
 - [**uv**](https://docs.astral.sh/uv/getting-started/installation/) – Blazing fast Python environment manager (written in Rust)

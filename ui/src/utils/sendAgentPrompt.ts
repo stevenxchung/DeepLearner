@@ -27,15 +27,18 @@ export async function sendAgentPrompt(
   setLoading(true);
   setAgentTyping(""); // Start streaming reply
 
-  try {
-    // Only include filename param if selected
-    const params = [
-      filename ? `filename=${encodeURIComponent(filename)}` : "",
-      `user_message=${encodeURIComponent(userMessage)}`,
-    ]
-      .filter(Boolean)
-      .join("&");
+  // Only include filename param if selected
+  const params = [
+    filename ? `filename=${encodeURIComponent(filename)}` : "",
+    `user_message=${encodeURIComponent(userMessage)}`,
+  ]
+    .filter(Boolean)
+    .join("&");
 
+  // Clear user input
+  setUserMessage("");
+
+  try {
     const response = await fetch(`${API_URL}/agent-stream?${params}`);
     if (!response.body) throw new Error("No response body from agent");
 
@@ -58,6 +61,5 @@ export async function sendAgentPrompt(
     ]);
     setAgentTyping(null);
   }
-  setUserMessage("");
   setLoading(false);
 }
