@@ -7,6 +7,7 @@ import {
   type JobQueuedResponse,
   type MediaJob,
 } from "../types";
+import { useFileContext } from "../context/FileContext";
 
 const API_URL = `${import.meta.env.VITE_MEDIA_PROCESSOR_API_URL}/media`;
 
@@ -29,19 +30,32 @@ async function pollJobStatus(
   jobId: string,
   pollTimeouts: React.RefObject<JobPollingTimeMap>,
   setJobMap: React.Dispatch<React.SetStateAction<Map<string, MediaJob>>>,
-  setApiError: React.Dispatch<React.SetStateAction<string | null>>
+  setApiError: React.Dispatch<React.SetStateAction<string | null>>,
+  refreshFiles: () => void
 ) {
   try {
     const res = await fetch(`${API_URL}/progress/${jobId}`);
     const job: MediaJob = await res.json();
     putJob(job, setJobMap);
 
-    if (job.status === JobStatus.DONE || job.status === JobStatus.FAILED) {
+    if (job.status === JobStatus.DONE) {
+      refreshFiles();
+      cleanup(pollTimeouts, jobId);
+      return;
+    } else if (job.status === JobStatus.FAILED) {
       cleanup(pollTimeouts, jobId);
       return;
     }
+
     pollTimeouts.current[jobId] = window.setTimeout(
-      () => pollJobStatus(jobId, pollTimeouts, setJobMap, setApiError),
+      () =>
+        pollJobStatus(
+          jobId,
+          pollTimeouts,
+          setJobMap,
+          setApiError,
+          refreshFiles
+        ),
       1000 * 3
     );
   } catch (e) {
@@ -64,6 +78,7 @@ function putJob(
 
 export function useMediaJob() {
   const { setJobMap } = useAppContext();
+  const { refreshFiles } = useFileContext();
   const [apiError, setApiError] = useState<string | null>(null);
 
   const pollTimeouts = useRef<JobPollingTimeMap>({});
@@ -111,7 +126,13 @@ export function useMediaJob() {
 
       initialJob.id = data.jobId;
       putJob(initialJob, setJobMap);
-      pollJobStatus(data.jobId, pollTimeouts, setJobMap, setApiError);
+      pollJobStatus(
+        data.jobId,
+        pollTimeouts,
+        setJobMap,
+        setApiError,
+        refreshFiles
+      );
     } catch {
       setApiError("Failed to connect to server.");
       cleanup(pollTimeouts, initialJobId);
