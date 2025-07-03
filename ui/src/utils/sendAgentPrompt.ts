@@ -1,6 +1,6 @@
-import type { Message } from "../types";
+import type { AgentRequest, Message } from "../types";
 
-const API_URL = `${import.meta.env.VITE_AGENT_ORX_API_URL}/api`;
+const AGENT_API_URL = `${import.meta.env.VITE_AGENT_ORX_API_URL}/api`;
 
 export async function sendAgentPrompt(
   e: React.FormEvent,
@@ -27,19 +27,17 @@ export async function sendAgentPrompt(
   setLoading(true);
   setAgentTyping(""); // Start streaming reply
 
-  // Only include filename param if selected
-  const params = [
-    filename ? `filename=${encodeURIComponent(filename)}` : "",
-    `user_message=${encodeURIComponent(userMessage)}`,
-  ]
-    .filter(Boolean)
-    .join("&");
-
   // Clear user input
   setUserMessage("");
 
   try {
-    const response = await fetch(`${API_URL}/agent-stream?${params}`);
+    const request: AgentRequest = { filename, message: userMessage };
+    const response = await fetch(`${AGENT_API_URL}/agent-stream`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(request),
+    });
+
     if (!response.body) throw new Error("No response body from agent");
 
     const reader = response.body.getReader();
@@ -52,6 +50,7 @@ export async function sendAgentPrompt(
       agentReply += decoder.decode(value, { stream: true });
       setAgentTyping(agentReply);
     }
+
     setChat((prev) => [...prev, { role: "agent", content: agentReply }]);
     setAgentTyping(null);
   } catch (err) {

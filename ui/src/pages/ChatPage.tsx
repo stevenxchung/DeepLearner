@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { useAppContext } from "../context/AppContext";
+import { useChatContext } from "../context/ChatContext";
 import { sendAgentPrompt } from "../utils/sendAgentPrompt";
 import { ChatMessages } from "../components/ChatMessages";
 import { ChatInput } from "../components/ChatInput";
 import { useFileContext } from "../context/FileContext";
 
 export const ChatPage: React.FC = () => {
-  const { chat, setChat } = useAppContext();
+  const { chat, setChat } = useChatContext();
   const { selectedFile } = useFileContext();
   const [userMessage, setUserMessage] = useState("");
   const [loading, setLoading] = useState(false);

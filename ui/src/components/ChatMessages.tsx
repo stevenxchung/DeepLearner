@@ -5,6 +5,14 @@ interface ChatMessagesProps {
   agentTyping: string | null;
 }
 
+const TypingDots: React.FC = () => (
+  <span className="inline-flex space-x-1 align-middle">
+    <span className="w-2 h-2 bg-[#002FA7] rounded-full animate-bounce [animation-delay:-150ms]"></span>
+    <span className="w-2 h-2 bg-[#002FA7] rounded-full animate-bounce [animation-delay:0ms]"></span>
+    <span className="w-2 h-2 bg-[#002FA7] rounded-full animate-bounce [animation-delay:150ms]"></span>
+  </span>
+);
+
 export const ChatMessages: React.FC<ChatMessagesProps> = ({
   chat,
   agentTyping,
@@ -33,7 +41,11 @@ export const ChatMessages: React.FC<ChatMessagesProps> = ({
     {agentTyping !== null && (
       <div className="my-2 flex justify-start">
         <div className="max-w-xl rounded-lg px-4 py-3 bg-green-100 text-green-900 animate-pulse">
-          <MarkdownMessage content={agentTyping} className="prose prose-sm" />
+          {agentTyping.length === 0 ? (
+            <TypingDots />
+          ) : (
+            <MarkdownMessage content={agentTyping} />
+          )}
         </div>
       </div>
     )}

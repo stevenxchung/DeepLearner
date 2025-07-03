@@ -32,9 +32,14 @@ export interface JobQueuedResponse {
 }
 
 export interface FileData {
-  name: string;
+  name: string; // Full filename with extension
   size: number; // In bytes
   created: string;
+}
+
+export interface AgentRequest {
+  filename: string;
+  message: string;
 }
 
 export type Message = { role: "user" | "agent"; content: string };

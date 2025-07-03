@@ -3,8 +3,8 @@ import uvicorn
 import ollama
 import logging
 
-from typing import Optional
-from fastapi import FastAPI, Query, HTTPException
+from pydantic import BaseModel
+from fastapi import FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -30,6 +30,11 @@ TEXT_DIR = os.path.join(ROOT_DIR, "_text")
 os.makedirs(TEXT_DIR, exist_ok=True)
 
 AGENT_NAME = "gemma3"
+
+
+class AgentRequest(BaseModel):
+    filename: str
+    message: str
 
 
 def _stream_agent(prompt):
@@ -63,11 +68,10 @@ def _stream_agent(prompt):
         yield "\n[Agent error]\n"
 
 
-@app.get("/api/agent-stream")
-def agent_stream(
-    filename: Optional[str] = Query(None),
-    user_message: str = Query("", alias="user_message"),
-):
+@app.post("/api/agent-stream")
+def agent_stream(req: AgentRequest):
+    filename = req.filename
+    message = req.message
     context = ""
     if filename:
         # Sanitize the filename
@@ -82,8 +86,8 @@ def agent_stream(
 
     # Compose prompt: context (if any), then user_message (if given)
     prompt = context
-    if user_message:
-        prompt = (prompt + "\n\n" + user_message) if prompt else user_message
+    if message:
+        prompt = (prompt + "\n\n" + message) if prompt else message
 
     return StreamingResponse(_stream_agent(prompt), media_type="text/plain")
 
