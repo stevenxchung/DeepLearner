@@ -7,7 +7,7 @@
 [![TypeScript](https://img.shields.io/badge/made%20with-TypeScript-blue)](https://www.typescriptlang.org/)
 [![Runs Locally](https://img.shields.io/badge/runs-locally-green)]()
 
----
+![Demo](./_assets/demo.gif)
 
 ## 🚀 Features
 
@@ -16,8 +16,6 @@
 - 🤖 **LLM Integration** with local models via [Ollama](https://ollama.com)
 - 🧰 Built with [`uv`](https://docs.astral.sh/uv/getting-started/installation/) and [`Bun`](https://bun.sh), ultra-fast Python and JavaScript package managers
 - 💻 Runs completely offline for maximum privacy and minimal cost (just your ⚡ bill 👀)
-
----
 
 ## 🧱 Requirements
 
