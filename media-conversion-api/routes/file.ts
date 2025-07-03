@@ -59,8 +59,13 @@ router.delete("/:filename", async (req: Request, res: Response) => {
     return;
   }
 
-  const filepath = path.join(TEXT_DIR, filename);
-  await fs.unlink(filepath);
+  const name = filename.includes(".")
+    ? filename.slice(0, filename.indexOf("."))
+    : filename;
+  // We only support `.txt` and `.mp3` files at this time
+  const textFile = path.join(TEXT_DIR, `${name}.txt`);
+  const audioFile = path.join(AUDIO_DIR, `${name}.mp3`);
+  await Promise.all([fs.unlink(textFile), fs.unlink(audioFile)]);
   res.send("Deleted");
   return;
 });

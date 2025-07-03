@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import type { FileData } from "../types";
 
-const API_URL = `${import.meta.env.VITE_MEDIA_PROCESSOR_API_URL}/file`;
+export const FILE_API_URL = `${
+  import.meta.env.VITE_MEDIA_PROCESSOR_API_URL
+}/file`;
 
 export function useFetchFiles(fileExtension?: string) {
   const [files, setFiles] = useState<FileData[]>([]);
@@ -13,7 +15,7 @@ export function useFetchFiles(fileExtension?: string) {
     setError(null);
 
     try {
-      const response = await fetch(`${API_URL}/files`);
+      const response = await fetch(`${FILE_API_URL}/files`);
       if (!response.ok) {
         throw new Error("Could not fetch files");
       }
