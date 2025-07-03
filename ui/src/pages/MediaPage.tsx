@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useMediaJob } from "../hooks/useMediaJob";
 import { ActionButton } from "../components/ActionButton";
 import { ReactiveInput } from "../components/ReactiveInput";
 import { JobTable } from "../components/JobTable";
@@ -7,10 +6,11 @@ import { JobType } from "../types";
 
 import reactLogo from "../assets/react.svg";
 import viteLogo from "/vite.svg";
+import { useJobContext } from "../context/JobContext";
 
 export const MediaPage: React.FC = () => {
   const [url, setUrl] = useState("");
-  const { apiError, startMediaJob } = useMediaJob();
+  const { apiError, startMediaJob } = useJobContext();
 
   return (
     <div className="flex flex-col w-full max-w-3xl mx-auto py-8 gap-4">
@@ -20,7 +20,15 @@ export const MediaPage: React.FC = () => {
             <img src={viteLogo} className="logo h-24" alt="Vite logo" />
           </a>
           <a href="https://react.dev" target="_blank">
-            <img src={reactLogo} className="logo h-24" alt="React logo" />
+            <img
+              src={reactLogo}
+              className="logo h-24"
+              style={{
+                animation: "spin 10s linear infinite",
+                transformOrigin: "center",
+              }}
+              alt="React logo"
+            />
           </a>
         </div>
       </div>

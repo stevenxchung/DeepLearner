@@ -1,4 +1,4 @@
-import { useAppContext } from "../context/AppContext";
+import { useJobContext } from "../context/JobContext";
 import { JobStatus, JobType, type MediaJob } from "../types";
 
 // Helpers for rendering
@@ -89,7 +89,7 @@ const JobRow = ({ job }: { job: MediaJob }) => {
 };
 
 export const JobTable: React.FC = () => {
-  const { jobMap } = useAppContext();
+  const { jobMap } = useJobContext();
   const jobs = [...jobMap.values()];
   jobs.sort(
     (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
