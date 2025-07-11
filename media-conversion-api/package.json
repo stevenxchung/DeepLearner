@@ -1,5 +1,5 @@
 {
-  "name": "media-conversion-api",
+  "name": "media-orchestrator-api",
   "module": "main.ts",
   "type": "module",
   "private": true,

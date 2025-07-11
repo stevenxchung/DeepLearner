@@ -52,8 +52,8 @@ export const JobProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const apiUrl =
       jobType === JobType.VIDEO_TO_AUDIO
-        ? `${MEDIA_API_URL}/video-to-audio`
-        : `${MEDIA_API_URL}/video-to-text`;
+        ? `${MEDIA_API_URL}/audio`
+        : `${MEDIA_API_URL}/text`;
 
     // Clear user input
     const urlToFetch = url;

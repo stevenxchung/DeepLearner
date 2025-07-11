@@ -84,7 +84,7 @@ def agent_stream(req: AgentRequest):
         with open(filepath, "r", encoding="utf-8") as f:
             context = f.read()
 
-    # Compose prompt: context (if any), then user_message (if given)
+    # Compose prompt: context (if any), then message (if given)
     prompt = context
     if message:
         prompt = (prompt + "\n\n" + message) if prompt else message

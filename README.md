@@ -17,6 +17,19 @@
 - 🧰 Built with [`uv`](https://docs.astral.sh/uv/getting-started/installation/) and [`Bun`](https://bun.sh), ultra-fast Python and JavaScript package managers
 - 💻 Runs completely offline for maximum privacy and minimal cost (just your ⚡ bill 👀)
 
+## 🏭 Architecture
+
+```
+[UI] ──▶ [Media Orchestrator API] ──▶ [Transcription API]
+│
+└──▶ [Agent Orchestrator API]
+```
+
+- **UI**: allows users to convert video into text and interact with an AI agent for summarization or deeper exploration of media content
+- **Media Orchestrator API**: provides endpoints to convert and manage audio and text files derived from video. It also supports polling for real-time media conversion status updates
+- **Transcription API**: transcribes audio to text and exposes an endpoint to check live transcription progress
+- **Agent Orchestrator API**: wraps an Ollama open-source model and streams LLM-generated responses back to the client
+
 ## 🧱 Requirements
 
 The following software needs to be installed on your local machine before running.

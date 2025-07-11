@@ -1,4 +1,4 @@
-# media-conversion-api
+# media-orchestrator-api
 
 This project was created using `bun init` in bun v1.2.15. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
 
@@ -27,7 +27,7 @@ curl http://localhost:5000/health
 ### Video ➡ Audio
 
 ```bash
-curl -X POST http://localhost:5000/video-to-audio \
+curl -X POST http://localhost:5000/audio \
   -H "Content-Type: application/json" \
   -d '{"url": "https://example.com"}'
 ```
@@ -35,7 +35,7 @@ curl -X POST http://localhost:5000/video-to-audio \
 ### Video ➡ Text
 
 ```bash
-curl -X POST http://localhost:5000/video-to-text \
+curl -X POST http://localhost:5000/text \
   -H "Content-Type: application/json" \
   -d '{"url": "https://example.com"}'
 ```

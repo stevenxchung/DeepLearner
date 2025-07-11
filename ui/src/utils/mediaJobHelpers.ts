@@ -1,8 +1,6 @@
 import { JobStatus, type JobPollingTimeMap, type MediaJob } from "../types";
 
-export const MEDIA_API_URL = `${
-  import.meta.env.VITE_MEDIA_PROCESSOR_API_URL
-}/media`;
+export const MEDIA_API_URL = `${import.meta.env.VITE_MEDIA_ORX_API_URL}/media`;
 
 export function cleanup(
   pollTimeouts: React.RefObject<JobPollingTimeMap>,

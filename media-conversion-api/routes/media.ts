@@ -6,7 +6,7 @@ import { addJob, deleteJob, getJob } from "../workers/media-job-worker";
 
 const router = express.Router();
 
-router.post("/video-to-audio", (req: Request, res: Response) => {
+router.post("/audio", (req: Request, res: Response) => {
   const { url, timestamp } = req.body;
   if (!url) {
     res.status(400).json({ error: "No url provided." });
@@ -32,7 +32,7 @@ router.post("/video-to-audio", (req: Request, res: Response) => {
   return;
 });
 
-router.post("/video-to-text", (req: Request, res: Response) => {
+router.post("/text", (req: Request, res: Response) => {
   const { url, timestamp } = req.body;
   if (!url) {
     res.status(400).json({ error: "No url provided." });

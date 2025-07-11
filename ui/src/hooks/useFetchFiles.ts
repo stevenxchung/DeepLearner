@@ -1,9 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { FileData } from "../types";
 
-export const FILE_API_URL = `${
-  import.meta.env.VITE_MEDIA_PROCESSOR_API_URL
-}/file`;
+export const FILE_API_URL = `${import.meta.env.VITE_MEDIA_ORX_API_URL}/file`;
 
 export function useFetchFiles(fileExtension?: string) {
   const [files, setFiles] = useState<FileData[]>([]);

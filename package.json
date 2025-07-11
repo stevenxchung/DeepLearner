@@ -1,9 +1,9 @@
 {
   "scripts": {
-    "dev": "concurrently -n agent-orchestrator-api,transcription-api,media-conversion-api,ui \"bun run dev:agent-orchestrator-api\" \"bun run dev:transcription-api\" \"bun run dev:media-conversion-api\" \"bun run dev:ui\"",
+    "dev": "concurrently -n agent-orchestrator-api,transcription-api,media-orchestrator-api,ui \"bun run dev:agent-orchestrator-api\" \"bun run dev:transcription-api\" \"bun run dev:media-orchestrator-api\" \"bun run dev:ui\"",
     "dev:agent-orchestrator-api": "cd ./agent-orchestrator-api && uv run main.py",
     "dev:transcription-api": "cd ./transcription-api && uv run main.py",
-    "dev:media-conversion-api": "bun run --cwd ./media-conversion-api start",
+    "dev:media-orchestrator-api": "bun run --cwd ./media-orchestrator-api start",
     "dev:ui": "bun run --cwd ./ui dev"
   },
   "devDependencies": {
