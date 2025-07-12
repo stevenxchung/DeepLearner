@@ -29,7 +29,8 @@ ROOT_DIR = os.path.abspath(os.path.join(API_DIR, ".."))
 TEXT_DIR = os.path.join(ROOT_DIR, "_text")
 os.makedirs(TEXT_DIR, exist_ok=True)
 
-AGENT_NAME = "gemma3"
+# Select any model from Ollama: https://ollama.com/search
+MODEL_NAME = "gemma3"
 
 
 class AgentRequest(BaseModel):
@@ -42,7 +43,7 @@ def _stream_agent(prompt):
     buffer = ""
     try:
         for chunk in ollama.chat(
-            model=AGENT_NAME,
+            model=MODEL_NAME,
             messages=[{"role": "user", "content": prompt}],
             stream=True,
         ):
