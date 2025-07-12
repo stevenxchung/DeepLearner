@@ -13,7 +13,7 @@ export async function audioToText(
   job: MediaJob,
   onProgress?: (percentage: number) => void
 ): Promise<AudioToTextResponse> {
-  const response = await fetch(`${TRANSCRIPTION_API}/transcribe`, {
+  const response = await fetch(`${TRANSCRIPTION_API}/transcription`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ job_id: job.id, filename: job.audioFilename }),
@@ -53,7 +53,7 @@ export async function audioToText(
     attempts++;
 
     const statusRes = await fetch(
-      `${TRANSCRIPTION_API}/transcribe/status/${job.id}`
+      `${TRANSCRIPTION_API}/transcription/status/${job.id}`
     );
     let statusData: TranscriptionStatusResponse | null = null;
     try {

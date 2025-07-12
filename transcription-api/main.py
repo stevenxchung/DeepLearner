@@ -136,7 +136,7 @@ def health_check():
     return "Healthy!"
 
 
-@app.post("/api/transcribe", response_model=TranscriptionStatus)
+@app.post("/api/transcription", response_model=TranscriptionStatus)
 def start_transcription(req: TranscriptionRequest, bg_tasks: BackgroundTasks):
     job_id = req.job_id
     job_cache[job_id] = TranscriptionStatus(
@@ -146,7 +146,7 @@ def start_transcription(req: TranscriptionRequest, bg_tasks: BackgroundTasks):
     return job_cache[job_id]
 
 
-@app.get("/api/transcribe/status/{job_id}", response_model=TranscriptionStatus)
+@app.get("/api/transcription/status/{job_id}", response_model=TranscriptionStatus)
 def get_status(job_id: str):
     return job_cache.get(
         job_id,

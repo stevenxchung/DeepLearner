@@ -29,7 +29,7 @@ curl http://localhost:5000/health
 ### Transcribe
 
 ```bash
-curl --location 'http://localhost:6000/transcribe' \
+curl --location 'http://localhost:6000/transcription' \
 --data '{
     "job_id": "<job_id>",
     "filename": "<filename>.mp3"
@@ -39,5 +39,5 @@ curl --location 'http://localhost:6000/transcribe' \
 ### Check Status
 
 ```bash
-curl --location --request GET 'http://localhost:6000/transcribe/status/:job_id'
+curl --location --request GET 'http://localhost:6000/transcription/status/:job_id'
 ```
