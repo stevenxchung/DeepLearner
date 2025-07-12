@@ -31,6 +31,7 @@ os.makedirs(TEXT_DIR, exist_ok=True)
 
 # Select any model from Ollama: https://ollama.com/search
 MODEL_NAME = "gemma3"
+STREAM_BUFFER_SIZE = 120
 
 
 class AgentRequest(BaseModel):
@@ -51,7 +52,7 @@ def _stream_agent(prompt):
             if content:
                 if not logged:
                     buffer += content
-                    if "." in buffer or len(buffer) > 120:
+                    if "." in buffer or len(buffer) > STREAM_BUFFER_SIZE:
                         first_sentence = buffer.split(".", 1)[0] + "."
                         logger.info(
                             "[Agent response] %r",
@@ -62,7 +63,7 @@ def _stream_agent(prompt):
         if not logged and buffer:
             logger.info(
                 "[Agent response] %r",
-                buffer[:120].strip(),
+                buffer[:STREAM_BUFFER_SIZE].strip(),
             )
     except Exception:
         logger.exception("Agent error")
