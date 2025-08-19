@@ -30,6 +30,13 @@
 - **Media Orchestrator API**: provides endpoints to convert and manage audio and text files derived from video. It also supports polling for real-time media conversion status updates
 - **Transcription API**: transcribes audio to text and exposes an endpoint to check live transcription progress
 
+## 👩‍💻 Running
+
+```bash
+bun run setup # Install all dependencies
+bun run dev   # Starts UI and backend services
+```
+
 ## 🧱 Requirements
 
 The following software needs to be installed on your local machine before running.

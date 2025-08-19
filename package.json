@@ -1,5 +1,8 @@
 {
   "scripts": {
+    "setup": "bun run setup:js && bun run setup:python",
+    "setup:js": "bun install --cwd ./media-orchestrator-api && bun install --cwd ./ui",
+    "setup:python": "cd ./agent-orchestrator-api && uv sync && cd ../transcription-api && uv sync",
     "dev": "concurrently -n agent-orchestrator-api,transcription-api,media-orchestrator-api,ui \"bun run dev:agent-orchestrator-api\" \"bun run dev:transcription-api\" \"bun run dev:media-orchestrator-api\" \"bun run dev:ui\"",
     "dev:agent-orchestrator-api": "cd ./agent-orchestrator-api && uv run main.py",
     "dev:transcription-api": "cd ./transcription-api && uv run main.py",
