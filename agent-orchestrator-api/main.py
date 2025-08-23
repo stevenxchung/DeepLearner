@@ -88,7 +88,7 @@ def agent_stream(req: AgentRequest):
 
     # Compose prompt: context (if any), then message (if given)
     if message:
-        prompt = f"CONTEXT: {context} \n\n UNLESS EXPLICITLY TOLD TO PROVIDE A DETAILED SUMMARY, PLEASE PROVIDE A BRIEF AND CONCISE ANSWER TO THE PROMPT: {message}"
+        prompt = f"CONTEXT: {context} \n\n PLEASE PROVIDE A BRIEF AND CONCISE ANSWER TO THE PROMPT: {message}"
 
     return StreamingResponse(_stream_agent(prompt), media_type="text/plain")
 
